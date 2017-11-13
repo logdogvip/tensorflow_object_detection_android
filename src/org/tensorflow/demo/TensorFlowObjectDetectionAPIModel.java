@@ -19,6 +19,8 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.os.Trace;
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +34,8 @@ import org.tensorflow.Graph;
 import org.tensorflow.Operation;
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import org.tensorflow.demo.env.Logger;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Wrapper for frozen detection models trained using the Tensorflow Object Detection API:
@@ -73,7 +77,8 @@ public class TensorFlowObjectDetectionAPIModel implements Classifier {
       final String modelFilename,
       final String labelFilename,
       final int inputSize) throws IOException {
-    final TensorFlowObjectDetectionAPIModel d = new TensorFlowObjectDetectionAPIModel();
+
+    final TensorFlowObjectDetectionAPIModel tensorFlowObjectDetectionAPIModel = new TensorFlowObjectDetectionAPIModel();
 
     InputStream labelsInput = null;
     String actualFilename = labelFilename.split("file:///android_asset/")[1];
@@ -83,25 +88,25 @@ public class TensorFlowObjectDetectionAPIModel implements Classifier {
     String line;
     while ((line = br.readLine()) != null) {
       LOGGER.w(line);
-      d.labels.add(line);
+      tensorFlowObjectDetectionAPIModel.labels.add(line);
     }
     br.close();
 
 
-    d.inferenceInterface = new TensorFlowInferenceInterface(assetManager, modelFilename);
+    tensorFlowObjectDetectionAPIModel.inferenceInterface = new TensorFlowInferenceInterface(assetManager, modelFilename);
 
-    final Graph g = d.inferenceInterface.graph();
+    final Graph g = tensorFlowObjectDetectionAPIModel.inferenceInterface.graph();
 
-    d.inputName = "image_tensor";
+    tensorFlowObjectDetectionAPIModel.inputName = "image_tensor";
     // The inputName node has a shape of [N, H, W, C], where
     // N is the batch size
     // H = W are the height and width
     // C is the number of channels (3 for our purposes - RGB)
-    final Operation inputOp = g.operation(d.inputName);
+    final Operation inputOp = g.operation(tensorFlowObjectDetectionAPIModel.inputName);
     if (inputOp == null) {
-      throw new RuntimeException("Failed to find input Node '" + d.inputName + "'");
+      throw new RuntimeException("Failed to find input Node '" + tensorFlowObjectDetectionAPIModel.inputName + "'");
     }
-    d.inputSize = inputSize;
+    tensorFlowObjectDetectionAPIModel.inputSize = inputSize;
     // The outputScoresName node has a shape of [N, NumLocations], where N
     // is the batch size.
     final Operation outputOp1 = g.operation("detection_scores");
@@ -118,15 +123,15 @@ public class TensorFlowObjectDetectionAPIModel implements Classifier {
     }
 
     // Pre-allocate buffers.
-    d.outputNames = new String[] {"detection_boxes", "detection_scores",
+    tensorFlowObjectDetectionAPIModel.outputNames = new String[] {"detection_boxes", "detection_scores",
                                   "detection_classes", "num_detections"};
-    d.intValues = new int[d.inputSize * d.inputSize];
-    d.byteValues = new byte[d.inputSize * d.inputSize * 3];
-    d.outputScores = new float[MAX_RESULTS];
-    d.outputLocations = new float[MAX_RESULTS * 4];
-    d.outputClasses = new float[MAX_RESULTS];
-    d.outputNumDetections = new float[1];
-    return d;
+    tensorFlowObjectDetectionAPIModel.intValues = new int[tensorFlowObjectDetectionAPIModel.inputSize * tensorFlowObjectDetectionAPIModel.inputSize];
+    tensorFlowObjectDetectionAPIModel.byteValues = new byte[tensorFlowObjectDetectionAPIModel.inputSize * tensorFlowObjectDetectionAPIModel.inputSize * 3];
+    tensorFlowObjectDetectionAPIModel.outputScores = new float[MAX_RESULTS];
+    tensorFlowObjectDetectionAPIModel.outputLocations = new float[MAX_RESULTS * 4];
+    tensorFlowObjectDetectionAPIModel.outputClasses = new float[MAX_RESULTS];
+    tensorFlowObjectDetectionAPIModel.outputNumDetections = new float[1];
+    return tensorFlowObjectDetectionAPIModel;
   }
 
   private TensorFlowObjectDetectionAPIModel() {}

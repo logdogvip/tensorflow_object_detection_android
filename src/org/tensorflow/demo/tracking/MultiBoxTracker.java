@@ -154,8 +154,7 @@ public class MultiBoxTracker {
     objectTracker.drawDebug(canvas, matrix);
   }
 
-  public synchronized void trackResults(
-      final List<Recognition> results, final byte[] frame, final long timestamp) {
+  public synchronized void trackResults(final List<Recognition> results, final byte[] frame, final long timestamp) {
     logger.i("Processing %d results from %d", results.size(), timestamp);
     processResults(timestamp, results, frame);
   }
