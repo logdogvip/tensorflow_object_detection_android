@@ -56,7 +56,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     private static final int TF_OD_API_INPUT_SIZE = 300;
     private static final String TF_OD_API_MODEL_FILE =
             "file:///android_asset/car2_frozen_inference_graph.pb";
-    private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/coco_labels_list copy.txt";
+    private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/car_labels_list.txt";
 
 
     // Minimum detection confidence to track a detection.

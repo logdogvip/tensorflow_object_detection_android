@@ -35,6 +35,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Trace;
+import android.util.Log;
 import android.util.Size;
 import android.view.KeyEvent;
 import android.view.Surface;
@@ -45,6 +46,8 @@ import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
 
 import java.nio.ByteBuffer;
+
+import static android.content.ContentValues.TAG;
 
 public abstract class CameraActivity extends Activity
         implements OnImageAvailableListener, Camera.PreviewCallback {
