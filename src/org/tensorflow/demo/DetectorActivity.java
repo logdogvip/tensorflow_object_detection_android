@@ -54,15 +54,15 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private static final Logger LOGGER = new Logger();
 
 
-  private static final int TF_OD_API_INPUT_SIZE = 600;
+  private static final int TF_OD_API_INPUT_SIZE = 300;
   private static final String TF_OD_API_MODEL_FILE =
-      "file:///android_asset/newv2_frozen_inference_graph.pb";
-  private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/coco_labels_list.txt";
+      "file:///android_asset/car2_frozen_inference_graph.pb";
+  private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/coco_labels_list copy.txt";
 
 
   // Minimum detection confidence to track a detection.
   // 信頼度(パセンテージのこと)
-  private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.6f;
+  private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.2f;
 
   private static final boolean MAINTAIN_ASPECT = false;
 
