@@ -72,10 +72,12 @@ public abstract class CameraActivity extends Activity
     protected void onCreate(final Bundle savedInstanceState) {
         LOGGER.d("onCreate " + this);
         super.onCreate(null);
+        // スクリーンをONに保つ.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setContentView(R.layout.activity_camera);
 
+        // リクエストがあるどうかを判定する.
         if (hasPermission()) {
             setFragment();
         } else {
@@ -310,38 +312,46 @@ public abstract class CameraActivity extends Activity
         return requiredLevel <= deviceLevel;
     }
 
+    /**
+     * リアカメラのIDを返却します.
+     *
+     * @return リアカメラのID
+     */
     private String chooseCamera() {
+        // Cameraマネージャを取得する.
         final CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
             for (final String cameraId : manager.getCameraIdList()) {
                 final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 
-                // We don't use a front facing camera in this sample.
+                // フロントカメラは用いない.
                 final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
 
-                final StreamConfigurationMap map =
-                        characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-
+                // このカメラデバイスがサポート可能なストリーム構成。また、各フォーマット/サイズの組み合わせの最小フレーム持続時間及び停止期間を含みます。
+                final StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 if (map == null) {
                     continue;
                 }
 
-                useCamera2API = isHardwareLevelSupported(characteristics,
-                        CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL);
+                // カメラ2APIを使うかどうかの判定.
+                useCamera2API = isHardwareLevelSupported(characteristics, CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL);
                 LOGGER.i("Camera API lv2?: %s", useCamera2API);
+
+                // 正常なリアカメラのIDを返却する.
                 return cameraId;
             }
         } catch (CameraAccessException e) {
-            LOGGER.e(e, "Not allowed to access camera");
+            LOGGER.e(e, "カメラへのアクセスが許可されていません");
         }
 
         return null;
     }
 
     protected void setFragment() {
+        //
         String cameraId = chooseCamera();
 
         Fragment fragment;
