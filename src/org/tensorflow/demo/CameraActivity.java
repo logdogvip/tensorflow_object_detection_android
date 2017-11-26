@@ -127,22 +127,18 @@ public abstract class CameraActivity extends Activity
         yuvBytes[0] = bytes;
         yRowStride = previewWidth;
 
-        imageConverter =
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        ImageUtils.convertYUV420SPToARGB8888(bytes, previewWidth, previewHeight, rgbBytes);
-                    }
-                };
+        imageConverter = new Runnable() {
+            @Override
+            public void run() {
+                ImageUtils.convertYUV420SPToARGB8888(bytes, previewWidth, previewHeight, rgbBytes);}
+        };
 
-        postInferenceCallback =
-                new Runnable() {
+        postInferenceCallback = new Runnable() {
                     @Override
                     public void run() {
                         camera.addCallbackBuffer(bytes);
-                        isProcessingFrame = false;
-                    }
-                };
+                        isProcessingFrame = false;}
+        };
         processImage();
     }
 
