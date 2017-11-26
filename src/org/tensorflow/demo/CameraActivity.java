@@ -374,6 +374,7 @@ public abstract class CameraActivity extends Activity
                     getLayoutId(),
                     getDesiredPreviewFrameSize());
 
+            // リアカメラのIDを設定します.
             camera2Fragment.setCamera(cameraId);
             fragment = camera2Fragment;
         } else {

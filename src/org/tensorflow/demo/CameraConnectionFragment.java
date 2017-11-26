@@ -16,6 +16,7 @@
 
 package org.tensorflow.demo;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -117,25 +118,15 @@ public class CameraConnectionFragment extends Fragment {
                         final TotalCaptureResult result) {
                 }
             };
-    /**
-     * ID of the current {@link CameraDevice}.
-     */
+    /** リアカメラのID */
     private String cameraId;
-    /**
-     * An {@link AutoFitTextureView} for camera preview.
-     */
+    /** AutoFitTextureViewはTextureViewのサブクラス.カメラプレビューに設定したAspect比に応じてサイズが自動的に切り替える機能を提供します */
     private AutoFitTextureView textureView;
-    /**
-     * A {@link CameraCaptureSession } for camera preview.
-     */
+    /** カメラプレビューのためのView */
     private CameraCaptureSession captureSession;
-    /**
-     * A reference to the opened {@link CameraDevice}.
-     */
+    /** カメラデバイスへの参照 */
     private CameraDevice cameraDevice;
-    /**
-     * The rotation in degrees of the camera sensor from the display.
-     */
+    /** カメラのセンサーの傾きを取得します. */
     private Integer sensorOrientation;
     /**
      * The {@link android.util.Size} of camera preview.
@@ -149,6 +140,30 @@ public class CameraConnectionFragment extends Fragment {
      * A {@link Handler} for running tasks in the background.
      */
     private Handler backgroundHandler;
+    /**
+     * {@link android.view.TextureView.SurfaceTextureListener}のリスナーの設定を行います.
+     * インスタンスの生成時に呼ばれる.
+     */
+    private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable(final SurfaceTexture texture, final int width, final int height) {
+            openCamera(width, height);
+        }
+
+        @Override
+        public void onSurfaceTextureSizeChanged(final SurfaceTexture texture, final int width, final int height) {
+            configureTransform(width, height);
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(final SurfaceTexture texture) {
+            return true;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(final SurfaceTexture texture) {
+        }
+    };
     /**
      * An {@link ImageReader} that handles preview frame capture.
      */
@@ -193,34 +208,8 @@ public class CameraConnectionFragment extends Fragment {
                     }
                 }
             };
-    /**
-     * {@link android.view.TextureView.SurfaceTextureListener} handles several lifecycle events on a
-     * {@link TextureView}.
-     */
-    private final TextureView.SurfaceTextureListener surfaceTextureListener =
-            new TextureView.SurfaceTextureListener() {
-                @Override
-                public void onSurfaceTextureAvailable(
-                        final SurfaceTexture texture, final int width, final int height) {
-                    openCamera(width, height);
-                }
 
-                @Override
-                public void onSurfaceTextureSizeChanged(
-                        final SurfaceTexture texture, final int width, final int height) {
-                    configureTransform(width, height);
-                }
-
-                @Override
-                public boolean onSurfaceTextureDestroyed(final SurfaceTexture texture) {
-                    return true;
-                }
-
-                @Override
-                public void onSurfaceTextureUpdated(final SurfaceTexture texture) {
-                }
-            };
-
+    @SuppressLint("ValidFragment")
     private CameraConnectionFragment(
             final ConnectionCallback connectionCallback,
             final OnImageAvailableListener imageListener,
@@ -233,12 +222,12 @@ public class CameraConnectionFragment extends Fragment {
     }
 
     /**
-     * Given {@code choices} of {@code Size}s supported by a camera, chooses the smallest one whose
-     * width and height are at least as large as the minimum of both, or an exact match if possible.
+     * カメラでサポートされているサイズの選択肢{@code choices}が与えられている場合、
+     * 幅と高さが少なくとも両者の最小値以上、または可能であれば完全一致する最小のものを選びます。
      *
-     * @param choices The list of sizes that the camera supports for the intended output class
-     * @param width   The minimum desired width
-     * @param height  The minimum desired height
+     * @param choices 意図した出力クラスに対してカメラがサポートするサイズのリスト
+     * @param width   最小の長さ
+     * @param height  最小の高さ
      * @return The optimal {@code Size}, or an arbitrary one if none were big enough
      */
     protected static Size chooseOptimalSize(final Size[] choices, final int width, final int height) {
@@ -285,10 +274,10 @@ public class CameraConnectionFragment extends Fragment {
     /**
      * インスタンスを生成します.
      *
-     * @param callback コールバック
+     * @param callback      コールバック
      * @param imageListener リスナー
-     * @param layout レイアウト
-     * @param inputSize インプットのサイズ
+     * @param layout        レイアウト
+     * @param inputSize     インプットのサイズ
      * @return
      */
     public static CameraConnectionFragment newInstance(
@@ -296,6 +285,7 @@ public class CameraConnectionFragment extends Fragment {
             final OnImageAvailableListener imageListener,
             final int layout,
             final Size inputSize) {
+        // memo インプットサイズには結果的には{@link DESIRED_SIZE}が入ってくる.
         return new CameraConnectionFragment(callback, imageListener, layout, inputSize);
     }
 
@@ -356,37 +346,38 @@ public class CameraConnectionFragment extends Fragment {
         super.onPause();
     }
 
+    /**
+     * リアカメラのIDを設定します.
+     *
+     * @param cameraId
+     */
     public void setCamera(String cameraId) {
         this.cameraId = cameraId;
     }
 
     /**
-     * Sets up member variables related to camera.
+     * カメラ関連のメンバ変数を設定します.
      */
     private void setUpCameraOutputs() {
-        final Activity activity = getActivity();
-        final CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+        // カメラマネージャを取得します.
+        final CameraManager manager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
         try {
+            // カメラデバイスの設定値を取得します.
             final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 
-            final StreamConfigurationMap map =
-                    characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            // 使用可能なストリームを格納する不変クラス(設定値?).
+            final StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
-            // For still image captures, we use the largest available size.
-            final Size largest =
-                    Collections.max(
-                            Arrays.asList(map.getOutputSizes(ImageFormat.YUV_420_888)),
-                            new CompareSizesByArea());
-
+            // カメラの傾きを取得します.
             sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
-            // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
-            // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
-            // garbage capture data.
-            previewSize =
-                    chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
-                            inputSize.getWidth(),
-                            inputSize.getHeight());
+            // カメラの意図した出力クラスに対してカメラがサポートするサイズのリスト.
+            Size[] choices = map.getOutputSizes(SurfaceTexture.class);
+
+            // 危険!!
+            // 大きすぎるプレビューサイズを使用しようとすると、カメラの帯域幅の制限を超える可能性があります。
+            // その結果、プレビューは綺麗ですが、ガベージキャプチャデータが保存されます。
+            previewSize = chooseOptimalSize(choices, inputSize.getWidth(), inputSize.getHeight());
 
             // We fit the aspect ratio of TextureView to the size of preview we picked.
             final int orientation = getResources().getConfiguration().orientation;
@@ -411,7 +402,7 @@ public class CameraConnectionFragment extends Fragment {
     }
 
     /**
-     * Opens the camera specified by {@link CameraConnectionFragment#cameraId}.
+     * リアカメラを開きます.
      */
     private void openCamera(final int width, final int height) {
         setUpCameraOutputs();
