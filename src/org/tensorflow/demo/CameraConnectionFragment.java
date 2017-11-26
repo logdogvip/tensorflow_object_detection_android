@@ -66,10 +66,7 @@ import java.util.concurrent.TimeUnit;
 public class CameraConnectionFragment extends Fragment {
     private static final Logger LOGGER = new Logger();
 
-    /**
-     * The camera preview size will be chosen to be the smallest frame by pixel size capable of
-     * containing a DESIRED_SIZE x DESIRED_SIZE square.
-     */
+    /**　カメラのプレビューサイズは、DESIRED_SIZE x DESIRED_SIZEの正方形を含むことができるピクセル単位の最小フレームになるように選択されます. */
     private static final int MINIMUM_PREVIEW_SIZE = 320;
 
     /**
@@ -234,39 +231,38 @@ public class CameraConnectionFragment extends Fragment {
         final int minSize = Math.max(Math.min(width, height), MINIMUM_PREVIEW_SIZE);
         final Size desiredSize = new Size(width, height);
 
-        // Collect the supported resolutions that are at least as big as the preview Surface
+        // 少なくともプレビューサーフェスと同じ大きさのサポートされている解像度を収集する
         boolean exactSizeFound = false;
-        final List<Size> bigEnough = new ArrayList<Size>();
-        final List<Size> tooSmall = new ArrayList<Size>();
+        final List<Size> bigEnough = new ArrayList<>();
+        final List<Size> tooSmall = new ArrayList<>();
         for (final Size option : choices) {
+            // 期待のサイズと同じサイズ
             if (option.equals(desiredSize)) {
-                // Set the size but don't return yet so that remaining sizes will still be logged.
+                // サイズを設定しますが、まだReturnせずに、残りのサイズは引き続き記録します。
                 exactSizeFound = true;
             }
 
             if (option.getHeight() >= minSize && option.getWidth() >= minSize) {
+                // 期待のサイズより大きいサイズ
                 bigEnough.add(option);
             } else {
+                // 期待のサイズより小さいサイズ
                 tooSmall.add(option);
             }
         }
 
-        LOGGER.i("Desired size: " + desiredSize + ", min size: " + minSize + "x" + minSize);
-        LOGGER.i("Valid preview sizes: [" + TextUtils.join(", ", bigEnough) + "]");
-        LOGGER.i("Rejected preview sizes: [" + TextUtils.join(", ", tooSmall) + "]");
-
+        // 期待値通りのものがあればそれを返却します.
         if (exactSizeFound) {
-            LOGGER.i("Exact size match found.");
             return desiredSize;
         }
 
-        // Pick the smallest of those, assuming we found any
+        // 期待値より大きいものがあればそれを返却します.
         if (bigEnough.size() > 0) {
             final Size chosenSize = Collections.min(bigEnough, new CompareSizesByArea());
-            LOGGER.i("Chosen size: " + chosenSize.getWidth() + "x" + chosenSize.getHeight());
             return chosenSize;
         } else {
-            LOGGER.e("Couldn't find any suitable preview size");
+            // 見つからなかった場合は最も小さいものを選びます.
+            LOGGER.e("適したサイズは見つからなかった");
             return choices[0];
         }
     }
@@ -404,6 +400,7 @@ public class CameraConnectionFragment extends Fragment {
     /**
      * リアカメラを開きます.
      */
+    @SuppressLint("MissingPermission")
     private void openCamera(final int width, final int height) {
         setUpCameraOutputs();
         configureTransform(width, height);
