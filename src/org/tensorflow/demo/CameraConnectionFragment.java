@@ -282,6 +282,15 @@ public class CameraConnectionFragment extends Fragment {
         }
     }
 
+    /**
+     * インスタンスを生成します.
+     *
+     * @param callback コールバック
+     * @param imageListener リスナー
+     * @param layout レイアウト
+     * @param inputSize インプットのサイズ
+     * @return
+     */
     public static CameraConnectionFragment newInstance(
             final ConnectionCallback callback,
             final OnImageAvailableListener imageListener,

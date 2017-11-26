@@ -290,6 +290,9 @@ public abstract class CameraActivity extends Activity
         }
     }
 
+    /**
+     * カメラのパーミッションをリクエストします.
+     */
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (shouldShowRequestPermissionRationale(PERMISSION_CAMERA) ||
@@ -351,32 +354,33 @@ public abstract class CameraActivity extends Activity
     }
 
     protected void setFragment() {
-        //
+        // リアカメラのIDを取得します.
         String cameraId = chooseCamera();
 
-        Fragment fragment;
+        // CameraConnectionFragmentをCamera2を使うかどうかによって分岐させます.
+        final Fragment fragment;
         if (useCamera2API) {
-            CameraConnectionFragment camera2Fragment =
-                    CameraConnectionFragment.newInstance(
-                            new CameraConnectionFragment.ConnectionCallback() {
-                                @Override
-                                public void onPreviewSizeChosen(final Size size, final int rotation) {
-                                    previewHeight = size.getHeight();
-                                    previewWidth = size.getWidth();
-                                    CameraActivity.this.onPreviewSizeChosen(size, rotation);
-                                }
-                            },
-                            this,
-                            getLayoutId(),
-                            getDesiredPreviewFrameSize());
+            final CameraConnectionFragment camera2Fragment = CameraConnectionFragment.newInstance(
+                    // 選択したプレビューサイズがわかったらデータを初期化するために使用するアクティビティのコールバック.
+                    new CameraConnectionFragment.ConnectionCallback() {
+                        @Override
+                        public void onPreviewSizeChosen(final Size size, final int rotation) {
+                            previewHeight = size.getHeight();
+                            previewWidth = size.getWidth();
+                            CameraActivity.this.onPreviewSizeChosen(size, rotation);
+                        }
+                    },
+                    this,
+                    getLayoutId(),
+                    getDesiredPreviewFrameSize());
 
             camera2Fragment.setCamera(cameraId);
             fragment = camera2Fragment;
         } else {
-            fragment =
-                    new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize());
+            fragment = new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize());
         }
 
+        // FragmentをViewにコミットする.
         getFragmentManager()
                 .beginTransaction()
                 .replace(R.id.container, fragment)
