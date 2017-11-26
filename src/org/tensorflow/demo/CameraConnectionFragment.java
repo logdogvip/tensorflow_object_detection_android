@@ -375,8 +375,11 @@ public class CameraConnectionFragment extends Fragment {
             // その結果、プレビューは綺麗ですが、ガベージキャプチャデータが保存されます。
             previewSize = chooseOptimalSize(choices, inputSize.getWidth(), inputSize.getHeight());
 
-            // We fit the aspect ratio of TextureView to the size of preview we picked.
+            // TextureViewのアスペクト比を、私たちが選んだプレビューのサイズに合わせます.
             final int orientation = getResources().getConfiguration().orientation;
+            // このコードで出力する画面のアスペクト比を決定している.
+            // ただしこのアスペクト比は矩形の場所の算出にも使っている.
+            // このアスペクト比が画面サイズのアスペクト比と合っていないと映像のアスペクト比がおかしくなる.
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 textureView.setAspectRatio(previewSize.getWidth(), previewSize.getHeight());
             } else {
@@ -385,15 +388,10 @@ public class CameraConnectionFragment extends Fragment {
         } catch (final CameraAccessException e) {
             LOGGER.e(e, "Exception!");
         } catch (final NullPointerException e) {
-            // Currently an NPE is thrown when the Camera2API is used but not supported on the
-            // device this code runs.
-            // TODO(andrewharp): abstract ErrorDialog/RuntimeException handling out into new method and
-            // reuse throughout app.
-            ErrorDialog.newInstance(getString(R.string.camera_error))
-                    .show(getChildFragmentManager(), FRAGMENT_DIALOG);
             throw new RuntimeException(getString(R.string.camera_error));
         }
 
+        // コールバック.
         cameraConnectionCallback.onPreviewSizeChosen(previewSize, sensorOrientation);
     }
 

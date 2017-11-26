@@ -65,7 +65,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     private static final boolean MAINTAIN_ASPECT = false;
 
-    private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
+    private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 360);
 
     private static final boolean SAVE_PREVIEW_BITMAP = false;
     private static final float TEXT_SIZE_DIP = 10;
