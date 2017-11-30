@@ -61,13 +61,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     // Minimum detection confidence to track a detection.
     // 信頼度(パセンテージのこと)
-    private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.2f;
+    private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.05f;
 
     private static final boolean MAINTAIN_ASPECT = false;
 
-    private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 360);
+    private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
 
-    private static final boolean SAVE_PREVIEW_BITMAP = false;
     private static final float TEXT_SIZE_DIP = 10;
     OverlayView trackingOverlay;
     private Integer sensorOrientation;
@@ -178,6 +177,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     protected void processImage() {
         ++timestamp;
         final long currTimestamp = timestamp;
+        // ここで画像を取得
         byte[] originalLuminance = getLuminance();
         tracker.onFrame(
                 previewWidth,
@@ -207,9 +207,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         final Canvas canvas = new Canvas(croppedBitmap);
         canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
         // For examining the actual TF input.
-        if (SAVE_PREVIEW_BITMAP) {
-            ImageUtils.saveBitmap(croppedBitmap);
-        }
 
         runInBackground(
                 new Runnable() {

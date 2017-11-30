@@ -66,7 +66,6 @@ public abstract class CameraActivity extends Activity
     private int yRowStride;
     private Runnable postInferenceCallback;
     private Runnable imageConverter;
-    private byte[] lastPreviewFrame;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -123,7 +122,6 @@ public abstract class CameraActivity extends Activity
         }
 
         isProcessingFrame = true;
-        lastPreviewFrame = bytes;
         yuvBytes[0] = bytes;
         yRowStride = previewWidth;
 
