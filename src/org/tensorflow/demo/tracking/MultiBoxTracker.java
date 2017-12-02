@@ -46,13 +46,15 @@ public class MultiBoxTracker {
     private static final float TEXT_SIZE_DIP = 18;
     // Maximum percentage of a box that can be overlapped by another box at detection time. Otherwise
     // the lower scored box (new or old) will be removed.
-    private static final float MAX_OVERLAP = 0.2f;
+    private static final float MAX_OVERLAP = 0.1f;
     private static final float MIN_SIZE = 16.0f;
     // Allow replacement of the tracked box with new results if
+
+    // この辺が相関係数
     // correlation has dropped below this level.
-    private static final float MARGINAL_CORRELATION = 0.75f;
+    private static final float MARGINAL_CORRELATION = 0.3f;
     // Consider object to be lost if correlation falls below this threshold.
-    private static final float MIN_CORRELATION = 0.3f;
+    private static final float MIN_CORRELATION = 0.1f;
     private static final int[] COLORS = {
             Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.WHITE,
             Color.parseColor("#55FF55"), Color.parseColor("#FFA500"), Color.parseColor("#FF8888"),

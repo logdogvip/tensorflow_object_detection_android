@@ -22,7 +22,7 @@ import android.os.Trace;
 
 import org.tensorflow.Graph;
 import org.tensorflow.Operation;
-import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
+import org.tensorflow.demo.contrib.TensorFlowInferenceInterface;
 import org.tensorflow.demo.env.Logger;
 
 import java.io.BufferedReader;

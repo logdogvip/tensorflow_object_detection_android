@@ -56,14 +56,14 @@ public class ObjectTracker {
     /**
      * How many history points to keep track of and draw in the red history line.
      */
-    private static final int MAX_DEBUG_HISTORY_SIZE = 30;
+    private static final int MAX_DEBUG_HISTORY_SIZE = 100;
     /**
      * How many frames of optical flow deltas to record.
      * TODO(andrewharp): Push this down to the native level so it can be polled
      * efficiently into a an array for upload, instead of keeping a duplicate
      * copy in Java.
      */
-    private static final int MAX_FRAME_HISTORY_SIZE = 200;
+    private static final int MAX_FRAME_HISTORY_SIZE = 400;
     private static final int DOWNSAMPLE_FACTOR = 2;
     protected static ObjectTracker instance;
     private static boolean libraryFound = false;

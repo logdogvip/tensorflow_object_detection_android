@@ -61,7 +61,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     // Minimum detection confidence to track a detection.
     // 信頼度(パセンテージのこと)
-    private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.05f;
+    private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.1f;
 
     private static final boolean MAINTAIN_ASPECT = false;
 
@@ -207,6 +207,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         final Canvas canvas = new Canvas(croppedBitmap);
         canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
         // For examining the actual TF input.
+
+
+        //region 上半分を白くする
+//        Paint paint = new Paint();
+//        paint.setColor(Color.argb(255, 255, 255, 255));
+//        paint.setStrokeWidth(400);
+//        canvas.drawLine(0, 0, canvas.getWidth(),0, paint);
+        //region 上半分を白くする
 
         runInBackground(
                 new Runnable() {
