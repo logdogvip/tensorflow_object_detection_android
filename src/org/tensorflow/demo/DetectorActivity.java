@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
@@ -196,6 +197,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         computingDetection = true;
         LOGGER.i("Preparing image " + currTimestamp + " for detection in bg thread.");
 
+        // ここでrgbBytesからBitmapに変換している.
         rgbFrameBitmap.setPixels(getRgbBytes(), 0, previewWidth, 0, 0, previewWidth, previewHeight);
 
         if (luminanceCopy == null) {
@@ -203,6 +205,17 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         }
         System.arraycopy(originalLuminance, 0, luminanceCopy, 0, originalLuminance.length);
         readyForNextImage();
+
+        // region 画面上半分を削除する
+        final Canvas rgb = new Canvas(rgbFrameBitmap);
+        // 元画像から切り出す位置を指定
+        Rect src = new Rect(0, 0, rgbFrameBitmap.getWidth()/2, rgbFrameBitmap.getHeight());
+        // リサイズ画像の領域を指定
+        Rect dst = new Rect(0, 0, rgbFrameBitmap.getWidth(), rgbFrameBitmap.getHeight());
+        // リサイズ画像をCanvasに描画
+        rgb.drawBitmap(rgbFrameBitmap,src,dst,null);
+        // endregion 画面上半分を削除する
+
 
         final Canvas canvas = new Canvas(croppedBitmap);
         canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
@@ -214,7 +227,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 //        paint.setColor(Color.argb(255, 255, 255, 255));
 //        paint.setStrokeWidth(400);
 //        canvas.drawLine(0, 0, canvas.getWidth(),0, paint);
-        //region 上半分を白くする
+        //endregion 上半分を白くする
 
         runInBackground(
                 new Runnable() {
@@ -237,6 +250,20 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                         for (final Classifier.Recognition result : results) {
                             Log.d(TAG, "run: " + result.toString());
                             final RectF location = result.getLocation();
+
+                            // region 画面下半分しか取らないことによる対応
+                            // 1.大きさを直す
+                            location.bottom = (location.bottom - location.top)/2 + location.top;
+
+                            // 画面位置を上半分に合わせる
+                            location.bottom = location.bottom - location.top/2;
+                            location.top =  location.top/2;
+
+                            // 2.位置を直す
+                            location.top =  location.top + croppedBitmap.getHeight()/2;
+                            location.bottom = location.bottom+ croppedBitmap.getHeight()/2;
+                            // endregion 画面下半分しか取らないことによる対応
+
                             if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE_TF_OD_API) {
                                 canvas.drawRect(location, paint);
 

@@ -63,11 +63,12 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+@SuppressLint("ValidFragment")
 public class CameraConnectionFragment extends Fragment {
     private static final Logger LOGGER = new Logger();
 
     /**　カメラのプレビューサイズは、DESIRED_SIZE x DESIRED_SIZEの正方形を含むことができるピクセル単位の最小フレームになるように選択されます. */
-    private static final int MINIMUM_PREVIEW_SIZE = 320;
+    private static final int MINIMUM_PREVIEW_SIZE = 400;
 
     /**
      * Conversion from screen rotation to JPEG orientation.

@@ -125,6 +125,7 @@ public abstract class CameraActivity extends Activity
         yuvBytes[0] = bytes;
         yRowStride = previewWidth;
 
+        // ここでbytesからrgbBytesに変換している.
         imageConverter = new Runnable() {
             @Override
             public void run() {
