@@ -20,6 +20,8 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -215,6 +217,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         // リサイズ画像をCanvasに描画
         rgb.drawBitmap(rgbFrameBitmap,src,dst,null);
         // endregion 画面上半分を削除する
+
+        // region 白黒にする(あんまり高速化に寄与しない)
+//        ColorMatrix ma = new ColorMatrix();
+//        ma.setSaturation(0);
+//        Paint paint = new Paint();
+//        paint.setColorFilter(new ColorMatrixColorFilter(ma));
+//        rgb.drawBitmap(rgbFrameBitmap, 0, 0, paint);
+        // endregion 白黒にする
 
 
         final Canvas canvas = new Canvas(croppedBitmap);
