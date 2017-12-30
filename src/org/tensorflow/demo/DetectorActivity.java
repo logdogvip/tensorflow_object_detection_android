@@ -208,36 +208,20 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         System.arraycopy(originalLuminance, 0, luminanceCopy, 0, originalLuminance.length);
         readyForNextImage();
 
-        // region 画面上半分を削除する
-        final Canvas rgb = new Canvas(rgbFrameBitmap);
-        // 元画像から切り出す位置を指定
-        Rect src = new Rect(0, 0, rgbFrameBitmap.getWidth()/2, rgbFrameBitmap.getHeight());
-        // リサイズ画像の領域を指定
-        Rect dst = new Rect(0, 0, rgbFrameBitmap.getWidth(), rgbFrameBitmap.getHeight());
-        // リサイズ画像をCanvasに描画
-        rgb.drawBitmap(rgbFrameBitmap,src,dst,null);
-        // endregion 画面上半分を削除する
-
-        // region 白黒にする(あんまり高速化に寄与しない)
-//        ColorMatrix ma = new ColorMatrix();
-//        ma.setSaturation(0);
-//        Paint paint = new Paint();
-//        paint.setColorFilter(new ColorMatrixColorFilter(ma));
-//        rgb.drawBitmap(rgbFrameBitmap, 0, 0, paint);
-        // endregion 白黒にする
+//        // region 画面上半分を削除する
+//        final Canvas rgb = new Canvas(rgbFrameBitmap);
+//        // 元画像から切り出す位置を指定
+//        Rect src = new Rect(0, 0, rgbFrameBitmap.getWidth()/2, rgbFrameBitmap.getHeight());
+//        // リサイズ画像の領域を指定
+//        Rect dst = new Rect(0, 0, rgbFrameBitmap.getWidth(), rgbFrameBitmap.getHeight());
+//        // リサイズ画像をCanvasに描画
+//        rgb.drawBitmap(rgbFrameBitmap,src,dst,null);
+//        // endregion 画面上半分を削除する
 
 
         final Canvas canvas = new Canvas(croppedBitmap);
         canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
         // For examining the actual TF input.
-
-
-        //region 上半分を白くする
-//        Paint paint = new Paint();
-//        paint.setColor(Color.argb(255, 255, 255, 255));
-//        paint.setStrokeWidth(400);
-//        canvas.drawLine(0, 0, canvas.getWidth(),0, paint);
-        //endregion 上半分を白くする
 
         runInBackground(
                 new Runnable() {
@@ -261,18 +245,18 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                             Log.d(TAG, "run: " + result.toString());
                             final RectF location = result.getLocation();
 
-                            // region 画面下半分しか取らないことによる対応
-                            // 1.大きさを直す
-                            location.bottom = (location.bottom - location.top)/2 + location.top;
-
-                            // 画面位置を上半分に合わせる
-                            location.bottom = location.bottom - location.top/2;
-                            location.top =  location.top/2;
-
-                            // 2.位置を直す
-                            location.top =  location.top + croppedBitmap.getHeight()/2;
-                            location.bottom = location.bottom+ croppedBitmap.getHeight()/2;
-                            // endregion 画面下半分しか取らないことによる対応
+//                            // region 画面下半分しか取らないことによる対応
+//                            // 1.大きさを直す
+//                            location.bottom = (location.bottom - location.top)/2 + location.top;
+//
+//                            // 画面位置を上半分に合わせる
+//                            location.bottom = location.bottom - location.top/2;
+//                            location.top =  location.top/2;
+//
+//                            // 2.位置を直す
+//                            location.top =  location.top + croppedBitmap.getHeight()/2;
+//                            location.bottom = location.bottom+ croppedBitmap.getHeight()/2;
+//                            // endregion 画面下半分しか取らないことによる対応
 
                             if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE_TF_OD_API) {
                                 canvas.drawRect(location, paint);
